@@ -276,6 +276,7 @@ function DayCounter() {
 
 function IntroScreen({ onEnter }) {
   const [phase, setPhase] = useState(0)
+  const isReady = phase >= 3
 
   useEffect(() => {
     const timers = [
@@ -286,8 +287,24 @@ function IntroScreen({ onEnter }) {
     return () => timers.forEach(clearTimeout)
   }, [])
 
+  const handleIntroKeyDown = (e) => {
+    if (!isReady) return
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onEnter()
+    }
+  }
+
   return (
-    <div className="intro" onClick={phase >= 3 ? onEnter : undefined}>
+    <div
+      className={`intro ${isReady ? 'ready' : ''}`}
+      role="button"
+      tabIndex={isReady ? 0 : -1}
+      aria-disabled={!isReady}
+      aria-label={isReady ? 'Abrir sorpresa de San Valentin' : 'Animacion de introduccion en progreso'}
+      onClick={isReady ? onEnter : undefined}
+      onKeyDown={handleIntroKeyDown}
+    >
       <Starfield />
       <div className="intro-glow" />
 
@@ -335,23 +352,26 @@ function RevealCard({ src, index, onReveal }) {
 
   return (
     <FadeIn delay={index * 0.08} className="reveal-card-wrapper">
-      <div
+      <button
+        type="button"
         className={`reveal-card ${revealed ? 'revealed' : ''}`}
         onClick={handleClick}
+        aria-label={`Tarjeta ${index + 1} ${revealed ? 'revelada' : 'oculta'}`}
+        aria-pressed={revealed}
       >
-        <div className="reveal-front">
-          <div className="reveal-number">{index + 1}</div>
-          <div className="reveal-icon">{'\u2764'}</div>
-          <p className="reveal-hint">Toca</p>
-          <div className="reveal-shimmer" />
-        </div>
-        <div className="reveal-back">
-          <div className="polaroid">
+        <span className="reveal-front">
+          <span className="reveal-number">{index + 1}</span>
+          <span className="reveal-icon">{'\u2764'}</span>
+          <span className="reveal-hint">Toca</span>
+          <span className="reveal-shimmer" />
+        </span>
+        <span className="reveal-back">
+          <span className="polaroid">
             <img src={src} alt={`Recuerdo ${index + 1}`} loading="lazy" />
-          </div>
-        </div>
+          </span>
+        </span>
         <SparkleBurst active={sparkle} />
-      </div>
+      </button>
     </FadeIn>
   )
 }
@@ -383,9 +403,15 @@ function Carousel({ photos, onPhotoClick }) {
     <div className="carousel">
       <div className="carousel-track" ref={trackRef}>
         {photos.map((src, i) => (
-          <div key={i} className="carousel-slide" onClick={() => onPhotoClick(src)}>
+          <button
+            key={i}
+            type="button"
+            className="carousel-slide"
+            onClick={() => onPhotoClick(src)}
+            aria-label={`Abrir foto del carrusel ${i + 1}`}
+          >
             <img src={src} alt={`Momento ${i + 1}`} loading="lazy" />
-          </div>
+          </button>
         ))}
       </div>
       <div className="carousel-fade-left" />
@@ -403,12 +429,17 @@ function Gallery({ photos, onPhotoClick }) {
     <div className="gallery-grid">
       {photos.map((src, i) => (
         <FadeIn key={i} delay={(i % 6) * 0.07} className={`gallery-cell ${sizes[i % sizes.length]}`}>
-          <div className="gallery-item" onClick={() => onPhotoClick(src)}>
+          <button
+            type="button"
+            className="gallery-item"
+            onClick={() => onPhotoClick(src)}
+            aria-label={`Abrir foto de la galeria ${i + 1}`}
+          >
             <img src={src} alt={`Foto ${i + 1}`} loading="lazy" />
-            <div className="gallery-overlay">
+            <span className="gallery-overlay" aria-hidden="true">
               <span>{'\u2764'}</span>
-            </div>
-          </div>
+            </span>
+          </button>
         </FadeIn>
       ))}
     </div>
@@ -430,6 +461,8 @@ function VideoSection() {
 function Lightbox({ src, onClose, allPhotos }) {
   const [offset, setOffset] = useState(0)
   const startX = useRef(0)
+  const dialogRef = useRef(null)
+  const lastActiveElementRef = useRef(null)
 
   const baseIdx = allPhotos.indexOf(src)
   const idx = baseIdx === -1 ? 0 : baseIdx + offset
@@ -443,19 +476,64 @@ function Lightbox({ src, onClose, allPhotos }) {
     })
   }, [baseIdx, allPhotos.length])
 
+  const getFocusableElements = useCallback(() => {
+    const root = dialogRef.current
+    if (!root) return []
+
+    return Array.from(
+      root.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter((el) => !el.hasAttribute('disabled'))
+  }, [])
+
   useEffect(() => {
+    lastActiveElementRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null
+
     const handleKey = (e) => {
       if (e.key === 'Escape') onClose()
       if (e.key === 'ArrowRight') navigate(1)
       if (e.key === 'ArrowLeft') navigate(-1)
+      if (e.key === 'Tab') {
+        const focusables = getFocusableElements()
+        if (focusables.length === 0) {
+          e.preventDefault()
+          dialogRef.current?.focus()
+          return
+        }
+
+        const first = focusables[0]
+        const last = focusables[focusables.length - 1]
+        const active = document.activeElement
+
+        if (e.shiftKey && active === first) {
+          e.preventDefault()
+          last.focus()
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
     }
+
     document.addEventListener('keydown', handleKey)
     document.body.style.overflow = 'hidden'
+    const focusables = getFocusableElements()
+    if (focusables.length > 0) {
+      focusables[0].focus()
+    } else {
+      dialogRef.current?.focus()
+    }
+
     return () => {
       document.removeEventListener('keydown', handleKey)
       document.body.style.overflow = ''
+      if (lastActiveElementRef.current?.focus) {
+        lastActiveElementRef.current.focus()
+      }
     }
-  }, [navigate, onClose])
+  }, [getFocusableElements, navigate, onClose])
 
   const handleTouchStart = (e) => { startX.current = e.touches[0].clientX }
   const handleTouchEnd = (e) => {
@@ -466,10 +544,35 @@ function Lightbox({ src, onClose, allPhotos }) {
   const currentIdx = allPhotos.indexOf(current)
 
   return (
-    <div className="lightbox" onClick={onClose}>
-      <button className="lightbox-close" onClick={onClose}>&times;</button>
+    <div
+      ref={dialogRef}
+      className="lightbox"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Visor de fotos"
+      tabIndex={-1}
+    >
+      <button
+        type="button"
+        className="lightbox-close"
+        onClick={(e) => {
+          e.stopPropagation()
+          onClose()
+        }}
+        aria-label="Cerrar visor de fotos"
+      >
+        &times;
+      </button>
       {currentIdx > 0 && (
-        <button className="lb-arrow lb-prev" onClick={(e) => { e.stopPropagation(); navigate(-1) }}>{'\u2039'}</button>
+        <button
+          type="button"
+          className="lb-arrow lb-prev"
+          aria-label="Foto anterior"
+          onClick={(e) => { e.stopPropagation(); navigate(-1) }}
+        >
+          {'\u2039'}
+        </button>
       )}
       <img
         key={current}
@@ -480,7 +583,14 @@ function Lightbox({ src, onClose, allPhotos }) {
         onTouchEnd={handleTouchEnd}
       />
       {currentIdx < allPhotos.length - 1 && (
-        <button className="lb-arrow lb-next" onClick={(e) => { e.stopPropagation(); navigate(1) }}>{'\u203A'}</button>
+        <button
+          type="button"
+          className="lb-arrow lb-next"
+          aria-label="Foto siguiente"
+          onClick={(e) => { e.stopPropagation(); navigate(1) }}
+        >
+          {'\u203A'}
+        </button>
       )}
       <div className="lb-counter">{idx + 1} / {allPhotos.length}</div>
     </div>

@@ -1,4 +1,21 @@
 /* ══════════════════════════════════
+   DESIGN TOKENS
+   ══════════════════════════════════ */
+:root {
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --surface-base: linear-gradient(155deg, rgba(255, 77, 109, 0.06), rgba(255, 77, 109, 0.02));
+  --surface-elevated: linear-gradient(155deg, rgba(255, 77, 109, 0.11), rgba(255, 77, 109, 0.04));
+  --surface-highlight: linear-gradient(155deg, rgba(255, 215, 0, 0.08), rgba(255, 77, 109, 0.05));
+  --border-soft: 1px solid rgba(255, 77, 109, 0.12);
+  --border-strong: 1px solid rgba(255, 77, 109, 0.2);
+  --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.26);
+  --shadow-elevated: 0 12px 34px rgba(0, 0, 0, 0.34);
+  --shadow-highlight: 0 16px 40px rgba(255, 77, 109, 0.16);
+}
+
+/* ══════════════════════════════════
    STARFIELD
    ══════════════════════════════════ */
 .starfield {
@@ -153,9 +170,13 @@
   justify-content: center;
   z-index: 50;
   background: #0a0406;
-  cursor: pointer;
+  cursor: default;
   -webkit-tap-highlight-color: transparent;
   overflow: hidden;
+}
+
+.intro.ready {
+  cursor: pointer;
 }
 
 .intro-glow {
@@ -425,6 +446,11 @@
 .counter-content {
   position: relative;
   z-index: 1;
+  background: var(--surface-base);
+  border: var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 1.6rem 1.3rem;
 }
 
 .counter-label {
@@ -515,6 +541,14 @@
   perspective: 900px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
 }
 
 .reveal-front,
@@ -529,14 +563,15 @@
 }
 
 .reveal-front {
-  background: linear-gradient(155deg, rgba(255, 77, 109, 0.1), rgba(255, 77, 109, 0.03));
-  border: 1px solid rgba(255, 77, 109, 0.15);
+  background: var(--surface-elevated);
+  border: var(--border-strong);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
   z-index: 2;
+  box-shadow: var(--shadow-soft);
 }
 
 /* Shimmer effect on cards */
@@ -636,9 +671,10 @@
   z-index: 1;
   text-align: center;
   padding: 2rem 1.5rem;
-  border: 1px solid rgba(255, 215, 0, 0.15);
-  border-radius: 20px;
-  background: linear-gradient(155deg, rgba(255, 215, 0, 0.06), rgba(255, 77, 109, 0.04));
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: var(--radius-lg);
+  background: var(--surface-highlight);
+  box-shadow: var(--shadow-highlight);
 }
 
 .secret-glow {
@@ -692,12 +728,13 @@
   max-width: 380px;
   margin: 0 auto;
   text-align: center;
-  background: linear-gradient(155deg, rgba(255, 77, 109, 0.06), rgba(255, 77, 109, 0.02));
-  border: 1px solid rgba(255, 77, 109, 0.1);
-  border-radius: 20px;
+  background: var(--surface-base);
+  border: var(--border-soft);
+  border-radius: var(--radius-lg);
   padding: 2.5rem 1.8rem;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-soft);
 }
 
 .love-letter::before {
@@ -762,12 +799,20 @@
   flex: 0 0 72vw;
   max-width: 320px;
   scroll-snap-align: center;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.3s ease;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-elevated);
+  border: none;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
 }
 
 .carousel-slide:active { transform: scale(0.97); }
@@ -805,8 +850,9 @@
 
 .video-player {
   width: 100%;
-  border-radius: 16px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-md);
+  border: var(--border-soft);
+  box-shadow: var(--shadow-elevated);
   background: #000;
 }
 
@@ -831,10 +877,20 @@
 
 .gallery-item {
   position: relative;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  width: 100%;
+  display: block;
 }
 
 .gallery-item img {
@@ -856,6 +912,7 @@
   align-items: center;
   justify-content: center;
   transition: background 0.3s ease;
+  pointer-events: none;
 }
 
 .gallery-overlay span {
@@ -895,7 +952,9 @@
   max-width: 96vw;
   max-height: 82vh;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
+  border: var(--border-soft);
+  box-shadow: var(--shadow-elevated);
   animation: lbImgIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -920,6 +979,8 @@
   z-index: 10;
   -webkit-tap-highlight-color: transparent;
   backdrop-filter: blur(8px);
+  border: var(--border-soft);
+  box-shadow: var(--shadow-soft);
 }
 
 .lb-arrow {
@@ -939,6 +1000,18 @@
   z-index: 10;
   -webkit-tap-highlight-color: transparent;
   backdrop-filter: blur(8px);
+  border: var(--border-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.intro:focus-visible,
+.reveal-card:focus-visible,
+.carousel-slide:focus-visible,
+.gallery-item:focus-visible,
+.lightbox-close:focus-visible,
+.lb-arrow:focus-visible {
+  outline: 2px solid #ffd700;
+  outline-offset: 3px;
 }
 
 .lb-prev { left: 0.5rem; }
@@ -1021,4 +1094,15 @@
   }
 
   .video-wrapper { max-width: 600px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
