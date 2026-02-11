@@ -1,0 +1,110 @@
+/* ===== Secret Letter Card ===== */
+.secret-letter-card {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(155deg, #fffdf7 40%, #fff4cc 100%);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 20px;
+  position: relative;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #2d2100;
+  overflow: hidden;
+}
+
+.secret-letter-glow {
+  box-shadow: 0 0 30px 6px rgba(255, 224, 102, 0.4);
+}
+
+.animate-in {
+  animation: scratchFadeIn 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes scratchFadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Header */
+.secret-letter-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.secret-letter-svg {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.secret-letter-svg svg {
+  width: 36px;
+  height: 36px;
+}
+
+.secret-letter-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.6rem;
+  color: #b8960a;
+  font-weight: 700;
+  text-shadow: 0 1px 6px rgba(255, 224, 102, 0.4);
+}
+
+/* Photo */
+.secret-letter-img-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.secret-letter-img {
+  width: 100%;
+  max-width: 280px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 0 3px rgba(255, 224, 102, 0.3);
+  border: 2px solid #fffbe6;
+}
+
+/* Body text */
+.secret-letter-body {
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.secret-letter-body p {
+  margin: 0;
+}
+
+.secret-letter-highlight {
+  color: #b8960a;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.secret-letter-highlight2 {
+  color: #d4a017;
+  font-family: 'Dancing Script', cursive;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Footer */
+.secret-letter-footer {
+  font-family: 'Dancing Script', cursive;
+  font-size: 0.95rem;
+  color: #b8960a;
+  margin-top: 8px;
+  text-align: center;
+  font-style: italic;
+}
