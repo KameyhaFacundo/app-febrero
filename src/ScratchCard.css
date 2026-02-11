@@ -1,3 +1,55 @@
+.scratch-card-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.scratch-card-ui {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  align-items: center;
+}
+
+.scratch-card-title {
+  margin: 0;
+  grid-column: 1 / -1;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffe8aa;
+  opacity: 0.92;
+  text-align: center;
+}
+
+.scratch-card-progress {
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.24);
+}
+
+.scratch-card-progress-bar {
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d9a722, #ffd560 45%, #fff1b8 75%, #ffd560);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.42);
+  transition: width 0.2s ease-out;
+}
+
+.scratch-card-percent {
+  margin: 0;
+  min-width: 42px;
+  text-align: right;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.75rem;
+  color: #ffe8aa;
+}
+
 .scratch-card-container {
   position: relative;
   display: flex;
@@ -5,19 +57,29 @@
   justify-content: center;
   background: transparent;
   border-radius: 18px;
-  box-shadow: 0 2px 24px 0 #ffd70044;
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.24), 0 0 0 1px rgba(255, 215, 0, 0.28);
   overflow: hidden;
 }
+
 .scratch-card-canvas {
   position: absolute;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   border-radius: 18px;
   touch-action: none;
   cursor: pointer;
   z-index: 2;
+  transition: opacity 0.28s ease, transform 0.28s ease, filter 0.28s ease;
 }
+
+.scratch-card-canvas.is-completing {
+  opacity: 0;
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
+
 .scratch-card-content {
   width: 100%;
   height: 100%;
@@ -29,21 +91,84 @@
   color: #fffbe6;
   font-family: inherit;
   text-align: center;
-  transition: opacity 0.7s cubic-bezier(.4,2,.6,1);
+  transition: opacity 0.7s cubic-bezier(0.4, 2, 0.6, 1);
   z-index: 1;
 }
+
 .scratch-card-content.revealed {
   opacity: 1;
 }
+
 .scratch-card-label {
   position: absolute;
   bottom: 10px;
-  left: 0; right: 0;
+  left: 0;
+  right: 0;
   text-align: center;
   color: #bfa200;
-  font-size: 1em;
+  font-size: 0.78rem;
   letter-spacing: 0.1em;
   pointer-events: none;
   z-index: 3;
   text-shadow: 0 2px 8px #000a;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+}
+
+.scratch-reveal-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+  border: 1px solid rgba(255, 215, 0, 0.55);
+  background: rgba(28, 16, 6, 0.74);
+  color: #ffe8aa;
+  border-radius: 999px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.34rem 0.62rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.scratch-reveal-btn:hover {
+  background: rgba(52, 31, 7, 0.82);
+  box-shadow: 0 4px 14px rgba(255, 215, 0, 0.18);
+}
+
+.scratch-reveal-btn:active {
+  transform: scale(0.97);
+}
+
+.scratch-reveal-btn:focus-visible {
+  outline: 2px solid #ffd700;
+  outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .scratch-card-title {
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+  }
+
+  .scratch-card-label {
+    font-size: 0.72rem;
+    bottom: 8px;
+  }
+
+  .scratch-reveal-btn {
+    font-size: 0.62rem;
+    padding: 0.3rem 0.55rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scratch-card-progress-bar,
+  .scratch-card-canvas,
+  .scratch-reveal-btn {
+    transition: none !important;
+  }
 }
