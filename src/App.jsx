@@ -76,29 +76,79 @@ const galleryPhotos = [
 
 const videoSrc = '/WhatsApp Video 2026-02-11 at 09.18.55.mp4'
 
-/* ───── Helpers ───── */
+/* ───── Starfield ───── */
+
+const starData = Array.from({ length: 60 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: 1 + Math.random() * 2,
+  delay: Math.random() * 5,
+  duration: 2 + Math.random() * 4,
+}))
+
+function Starfield() {
+  return (
+    <div className="starfield" aria-hidden="true">
+      {starData.map(s => (
+        <div
+          key={s.id}
+          className="star"
+          style={{
+            left: `${s.x}%`,
+            top: `${s.y}%`,
+            width: `${s.size}px`,
+            height: `${s.size}px`,
+            animationDelay: `${s.delay}s`,
+            animationDuration: `${s.duration}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+/* ───── Floating Hearts ───── */
+
+const heartData = Array.from({ length: 15 }, (_, i) => ({
+  id: i,
+  left: Math.random() * 100,
+  delay: Math.random() * 10,
+  duration: 8 + Math.random() * 8,
+  size: 10 + Math.random() * 16,
+  opacity: 0.1 + Math.random() * 0.25,
+  filled: i % 3 === 0,
+}))
 
 function FloatingHearts() {
   return (
     <div className="floating-hearts" aria-hidden="true">
-      {Array.from({ length: 18 }, (_, i) => (
+      {heartData.map(h => (
         <span
-          key={i}
+          key={h.id}
           className="fheart"
           style={{
-            left: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 10}s`,
-            animationDuration: `${7 + Math.random() * 8}s`,
-            fontSize: `${10 + Math.random() * 18}px`,
-            opacity: 0.15 + Math.random() * 0.35,
+            left: `${h.left}%`,
+            animationDelay: `${h.delay}s`,
+            animationDuration: `${h.duration}s`,
+            fontSize: `${h.size}px`,
+            opacity: h.opacity,
           }}
         >
-          {i % 3 === 0 ? '\u2764' : '\u2661'}
+          {h.filled ? '\u2764' : '\u2661'}
         </span>
       ))}
     </div>
   )
 }
+
+/* ───── Fog Divider ───── */
+
+function Fog() {
+  return <div className="fog-divider" aria-hidden="true" />
+}
+
+/* ───── FadeIn ───── */
 
 function FadeIn({ children, className = '', delay = 0 }) {
   const ref = useRef(null)
@@ -109,7 +159,7 @@ function FadeIn({ children, className = '', delay = 0 }) {
     if (!el) return
     const observer = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) { setVisible(true); observer.disconnect() } },
-      { threshold: 0.12 }
+      { threshold: 0.1 }
     )
     observer.observe(el)
     return () => observer.disconnect()
@@ -126,59 +176,203 @@ function FadeIn({ children, className = '', delay = 0 }) {
   )
 }
 
-/* ───── Intro ───── */
+/* ───── Typewriter ───── */
 
-function IntroScreen({ onEnter }) {
-  const [ready, setReady] = useState(false)
+function Typewriter({ text, speed = 50, delay = 0 }) {
+  const [displayed, setDisplayed] = useState('')
+  const [started, setStarted] = useState(false)
+  const ref = useRef(null)
 
   useEffect(() => {
-    const t = setTimeout(() => setReady(true), 400)
-    return () => clearTimeout(t)
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setStarted(true); observer.disconnect() } },
+      { threshold: 0.5 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (!started) return
+    let i = 0
+    const timer = setTimeout(() => {
+      const interval = setInterval(() => {
+        i++
+        setDisplayed(text.slice(0, i))
+        if (i >= text.length) clearInterval(interval)
+      }, speed)
+      return () => clearInterval(interval)
+    }, delay)
+    return () => clearTimeout(timer)
+  }, [started, text, speed, delay])
+
   return (
-    <div className={`intro ${ready ? 'ready' : ''}`} onClick={onEnter}>
-      <div className="intro-glow" />
-      <div className="intro-envelope">
-        <div className="envelope-flap" />
-        <div className="envelope-body">
-          <div className="envelope-heart">{'\u2764'}</div>
-        </div>
-      </div>
-      <p className="intro-text">Toca para abrir</p>
-      <div className="intro-ring" />
-      <div className="intro-ring ring2" />
+    <span ref={ref} className="typewriter">
+      {displayed}
+      <span className="typewriter-cursor">|</span>
+    </span>
+  )
+}
+
+/* ───── Sparkle Burst ───── */
+
+const sparkleData = Array.from({ length: 12 }, (_, i) => ({
+  id: i,
+  angle: i * 30,
+  dist: 40 + Math.random() * 30,
+  delay: Math.random() * 0.15,
+}))
+
+function SparkleBurst({ active }) {
+  if (!active) return null
+  return (
+    <div className="sparkle-burst" aria-hidden="true">
+      {sparkleData.map(s => (
+        <div
+          key={s.id}
+          className="sparkle"
+          style={{
+            '--angle': `${s.angle}deg`,
+            '--dist': `${s.dist}px`,
+            animationDelay: `${s.delay}s`,
+          }}
+        />
+      ))}
     </div>
   )
 }
 
-/* ───── Reveal Cards ───── */
+/* ───── Day Counter ───── */
 
-function RevealCard({ src, index }) {
-  const [revealed, setRevealed] = useState(false)
+function DayCounter() {
+  const startDate1 = new Date('2024-03-04')
+  const now = new Date()
+  const days1 = Math.floor((now - startDate1) / (1000 * 60 * 60 * 24))
 
   return (
-    <FadeIn delay={index * 0.08} className="reveal-card-wrapper">
-      <div
-        className={`reveal-card ${revealed ? 'revealed' : ''}`}
-        onClick={() => setRevealed(true)}
-      >
-        <div className="reveal-front">
-          <div className="reveal-number">{index + 1}</div>
-          <div className="reveal-icon">{'\u2764'}</div>
-          <p className="reveal-hint">Toca</p>
-        </div>
-        <div className="reveal-back">
-          <div className="polaroid">
-            <img src={src} alt={`Recuerdo ${index + 1}`} loading="lazy" />
-          </div>
+    <FadeIn className="day-counter">
+      <div className="counter-glow" />
+      <div className="counter-content">
+        <p className="counter-label">hace</p>
+        <div className="counter-number">{days1}</div>
+        <p className="counter-unit">días</p>
+        <p className="counter-sub">y cada uno mejor que el anterior</p>
+        <p className="counter-special">2do San Valentín juntos</p>
+        <div className="counter-historic">
+          <span style={{fontSize: '0.95em', opacity: 0.7}}>
+            hace <b>{days1}</b> días (desde el 4/3/2024)
+          </span>
         </div>
       </div>
     </FadeIn>
   )
 }
 
-/* ───── Horizontal Carousel ───── */
+/* ───── Intro (Dramatic) ───── */
+
+function IntroScreen({ onEnter }) {
+  const [phase, setPhase] = useState(0)
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setPhase(1), 500),
+      setTimeout(() => setPhase(2), 2200),
+      setTimeout(() => setPhase(3), 4000),
+    ]
+    return () => timers.forEach(clearTimeout)
+  }, [])
+
+  return (
+    <div className="intro" onClick={phase >= 3 ? onEnter : undefined}>
+      <Starfield />
+      <div className="intro-glow" />
+
+      <p className={`intro-whisper ${phase >= 1 ? 'show' : ''}`}>
+        Tengo algo para vos...
+      </p>
+
+      <div className={`intro-envelope-wrap ${phase >= 2 ? 'show' : ''}`}>
+        <div className="intro-envelope">
+          <div className="envelope-flap" />
+          <div className="envelope-body">
+            <div className="envelope-heart">{'\u2764'}</div>
+          </div>
+        </div>
+      </div>
+
+      <p className={`intro-text ${phase >= 3 ? 'show' : ''}`}>
+        Toca para abrir
+      </p>
+
+      <div className={`intro-ring ${phase >= 3 ? 'show' : ''}`} />
+      <div className={`intro-ring ring2 ${phase >= 3 ? 'show' : ''}`} />
+    </div>
+  )
+}
+
+/* ───── Reveal Cards ───── */
+
+function RevealCard({ src, index, onReveal }) {
+
+  const [revealed, setRevealed] = useState(false)
+  const [sparkle, setSparkle] = useState(false)
+
+  const handleClick = () => {
+    setRevealed(prev => {
+      const next = !prev;
+      setTimeout(() => onReveal(index, next), 0);
+      if (next) {
+        setSparkle(true);
+        setTimeout(() => setSparkle(false), 700);
+      }
+      return next;
+    });
+  }
+
+  return (
+    <FadeIn delay={index * 0.08} className="reveal-card-wrapper">
+      <div
+        className={`reveal-card ${revealed ? 'revealed' : ''}`}
+        onClick={handleClick}
+      >
+        <div className="reveal-front">
+          <div className="reveal-number">{index + 1}</div>
+          <div className="reveal-icon">{'\u2764'}</div>
+          <p className="reveal-hint">Toca</p>
+          <div className="reveal-shimmer" />
+        </div>
+        <div className="reveal-back">
+          <div className="polaroid">
+            <img src={src} alt={`Recuerdo ${index + 1}`} loading="lazy" />
+          </div>
+        </div>
+        <SparkleBurst active={sparkle} />
+      </div>
+    </FadeIn>
+  )
+}
+
+/* ───── Secret Message ───── */
+
+function SecretMessage({ unlocked }) {
+  return (
+    <div className={`secret-message ${unlocked ? 'unlocked' : ''}`}>
+      <div className="secret-glow" />
+      <div className="secret-content">
+        <p className="secret-label">{'\u2728'} Mensaje secreto desbloqueado {'\u2728'}</p>
+        <p className="secret-text">
+          Cada foto es un pedacito de nuestra historia. Gracias por hacerme
+          tan feliz. Te amo infinitamente.
+        </p>
+        <div className="secret-heart">{'\u2764'}</div>
+      </div>
+    </div>
+  )
+}
+
+/* ───── Carousel ───── */
 
 function Carousel({ photos, onPhotoClick }) {
   const trackRef = useRef(null)
@@ -187,11 +381,7 @@ function Carousel({ photos, onPhotoClick }) {
     <div className="carousel">
       <div className="carousel-track" ref={trackRef}>
         {photos.map((src, i) => (
-          <div
-            key={i}
-            className="carousel-slide"
-            onClick={() => onPhotoClick(src)}
-          >
+          <div key={i} className="carousel-slide" onClick={() => onPhotoClick(src)}>
             <img src={src} alt={`Momento ${i + 1}`} loading="lazy" />
           </div>
         ))}
@@ -228,25 +418,28 @@ function Gallery({ photos, onPhotoClick }) {
 function VideoSection() {
   return (
     <FadeIn className="video-wrapper">
-      <video
-        className="video-player"
-        src={videoSrc}
-        controls
-        playsInline
-        preload="metadata"
-        poster=""
-      />
+      <video className="video-player" src={videoSrc} controls playsInline preload="metadata" />
     </FadeIn>
   )
 }
 
-/* ───── Lightbox with swipe ───── */
+/* ───── Lightbox ───── */
 
 function Lightbox({ src, onClose, allPhotos }) {
-  const [current, setCurrent] = useState(src)
+  const [offset, setOffset] = useState(0)
   const startX = useRef(0)
 
-  useEffect(() => setCurrent(src), [src])
+  const baseIdx = allPhotos.indexOf(src)
+  const idx = baseIdx === -1 ? 0 : baseIdx + offset
+  const current = allPhotos[Math.max(0, Math.min(idx, allPhotos.length - 1))]
+
+  const navigate = useCallback((dir) => {
+    setOffset(prev => {
+      const newIdx = baseIdx + prev + dir
+      if (newIdx < 0 || newIdx >= allPhotos.length) return prev
+      return prev + dir
+    })
+  }, [baseIdx, allPhotos.length])
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -260,14 +453,7 @@ function Lightbox({ src, onClose, allPhotos }) {
       document.removeEventListener('keydown', handleKey)
       document.body.style.overflow = ''
     }
-  }, [current])
-
-  const navigate = (dir) => {
-    const idx = allPhotos.indexOf(current)
-    if (idx === -1) return
-    const next = idx + dir
-    if (next >= 0 && next < allPhotos.length) setCurrent(allPhotos[next])
-  }
+  }, [navigate, onClose])
 
   const handleTouchStart = (e) => { startX.current = e.touches[0].clientX }
   const handleTouchEnd = (e) => {
@@ -275,12 +461,12 @@ function Lightbox({ src, onClose, allPhotos }) {
     if (Math.abs(diff) > 50) navigate(diff > 0 ? 1 : -1)
   }
 
-  const idx = allPhotos.indexOf(current)
+  const currentIdx = allPhotos.indexOf(current)
 
   return (
     <div className="lightbox" onClick={onClose}>
       <button className="lightbox-close" onClick={onClose}>&times;</button>
-      {idx > 0 && (
+      {currentIdx > 0 && (
         <button className="lb-arrow lb-prev" onClick={(e) => { e.stopPropagation(); navigate(-1) }}>{'\u2039'}</button>
       )}
       <img
@@ -291,7 +477,7 @@ function Lightbox({ src, onClose, allPhotos }) {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       />
-      {idx < allPhotos.length - 1 && (
+      {currentIdx < allPhotos.length - 1 && (
         <button className="lb-arrow lb-next" onClick={(e) => { e.stopPropagation(); navigate(1) }}>{'\u203A'}</button>
       )}
       <div className="lb-counter">{idx + 1} / {allPhotos.length}</div>
@@ -305,25 +491,35 @@ function App() {
   const [entered, setEntered] = useState(false)
   const [showContent, setShowContent] = useState(false)
   const [lightboxSrc, setLightboxSrc] = useState(null)
+    const [revealedCards, setRevealedCards] = useState(new Set())
 
   const allPhotos = [...revealPhotos, ...carouselPhotos, ...galleryPhotos]
+  const allRevealed = revealedCards.size === revealPhotos.length
 
   const handleEnter = useCallback(() => {
     setEntered(true)
     setTimeout(() => setShowContent(true), 600)
   }, [])
 
+    const handleReveal = useCallback((index, revealed) => {
+      setRevealedCards(prev => {
+        const next = new Set(prev)
+        if (revealed) {
+          next.add(index)
+        } else {
+          next.delete(index)
+        }
+        return next
+      })
+    }, [])
+
   if (!entered) {
-    return (
-      <>
-        <FloatingHearts />
-        <IntroScreen onEnter={handleEnter} />
-      </>
-    )
+    return <IntroScreen onEnter={handleEnter} />
   }
 
   return (
     <div className={`app ${showContent ? 'show' : ''}`}>
+      <Starfield />
       <FloatingHearts />
 
       {/* Hero */}
@@ -333,13 +529,22 @@ function App() {
           <h1 className="hero-title">Feliz San Valentín</h1>
           <div className="hero-heart">{'\u2764'}</div>
           <p className="hero-subtitle">
-            Cada momento a tu lado es un regalo que guardo en el corazón
+            <Typewriter text="Cada momento a tu lado es un regalo que guardo en el corazón..." speed={45} delay={800} />
           </p>
         </FadeIn>
         <div className="scroll-indicator">
           <div className="scroll-line" />
         </div>
       </header>
+
+      <Fog />
+
+      {/* Day counter */}
+      <section className="section counter-section">
+        <DayCounter />
+      </section>
+
+      <Fog />
 
       {/* Reveal */}
       <section className="section reveal-section">
@@ -349,10 +554,13 @@ function App() {
         </FadeIn>
         <div className="reveal-grid">
           {revealPhotos.map((src, i) => (
-            <RevealCard key={i} src={src} index={i} />
+            <RevealCard key={i} src={src} index={i} onReveal={handleReveal} />
           ))}
         </div>
+          <SecretMessage unlocked={allRevealed} />
       </section>
+
+      <Fog />
 
       {/* Love letter */}
       <section className="section message-section">
@@ -368,6 +576,8 @@ function App() {
         </FadeIn>
       </section>
 
+      <Fog />
+
       {/* Carousel */}
       <section className="section carousel-section">
         <FadeIn>
@@ -377,6 +587,8 @@ function App() {
         <Carousel photos={carouselPhotos} onPhotoClick={setLightboxSrc} />
       </section>
 
+      <Fog />
+
       {/* Video */}
       <section className="section video-section">
         <FadeIn>
@@ -384,6 +596,8 @@ function App() {
         </FadeIn>
         <VideoSection />
       </section>
+
+      <Fog />
 
       {/* Gallery */}
       <section className="section gallery-section">
@@ -402,11 +616,7 @@ function App() {
       </footer>
 
       {lightboxSrc && (
-        <Lightbox
-          src={lightboxSrc}
-          onClose={() => setLightboxSrc(null)}
-          allPhotos={allPhotos}
-        />
+        <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} allPhotos={allPhotos} />
       )}
     </div>
   )
