@@ -249,22 +249,24 @@ function SparkleBurst({ active }) {
 /* ───── Day Counter ───── */
 
 function DayCounter() {
-  const startDate1 = new Date('2024-03-04')
+  const start = new Date(2024, 2, 4) // 4 de Marzo 2024 (mes 2 = marzo)
   const now = new Date()
-  const days1 = Math.floor((now - startDate1) / (1000 * 60 * 60 * 24))
+  const totalDays = Math.floor((now - start) / (1000 * 60 * 60 * 24))
+
+  const years = 2
 
   return (
     <FadeIn className="day-counter">
       <div className="counter-glow" />
       <div className="counter-content">
-        <p className="counter-label">hace</p>
-        <div className="counter-number">{days1}</div>
-        <p className="counter-unit">días</p>
+        <p className="counter-label">¡Felices</p>
+        <div className="counter-number">{years}</div>
+        <p className="counter-unit">años</p>
         <p className="counter-sub">y cada uno mejor que el anterior</p>
-        <p className="counter-special">2do San Valentín juntos</p>
+        <p className="counter-special">{totalDays} días juntos</p>
         <div className="counter-historic">
           <span style={{fontSize: '0.95em', opacity: 0.7}}>
-            hace <b>{days1}</b> días (desde el 4/3/2024)
+            <b>{totalDays}</b> días desde el 4/3/2024
           </span>
         </div>
       </div>
@@ -301,7 +303,7 @@ function IntroScreen({ onEnter }) {
       role="button"
       tabIndex={isReady ? 0 : -1}
       aria-disabled={!isReady}
-      aria-label={isReady ? 'Abrir sorpresa de San Valentin' : 'Animacion de introduccion en progreso'}
+      aria-label={isReady ? 'Abrir sorpresa de aniversario' : 'Animacion de introduccion en progreso'}
       onClick={isReady ? onEnter : undefined}
       onKeyDown={handleIntroKeyDown}
     >
@@ -637,8 +639,8 @@ function App() {
       {/* Hero */}
       <header className="hero">
         <FadeIn>
-          <p className="hero-date">14 de Febrero</p>
-          <h1 className="hero-title">Feliz San Valentín</h1>
+          <p className="hero-date">4 de Marzo</p>
+          <h1 className="hero-title">Felices 2 Años de Novios</h1>
           <div className="hero-heart">{'\u2764'}</div>
           <p className="hero-subtitle">
             <Typewriter text="Cada momento a tu lado es un regalo que guardo en el corazón..." speed={45} delay={800} />
