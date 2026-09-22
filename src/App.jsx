@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import './App.css'
-import './ScratchCard.pro.css'
 
 const revealPhotos = [
   '/IMG-20240303-WA0008.jpg',
@@ -639,24 +638,6 @@ function RevealCard({ src, index, onReveal }) {
   )
 }
 
-/* ───── Secret Message ───── */
-
-function SecretMessage({ unlocked }) {
-  return (
-    <div className={`secret-message ${unlocked ? 'unlocked' : ''}`}>
-      <div className="secret-glow" />
-      <div className="secret-content">
-        <p className="secret-label">{'\uD83C\uDF3C'} Mensaje secreto desbloqueado {'\uD83C\uDF3C'}</p>
-        <p className="secret-text">
-          Cada foto es un pedacito de nuestra historia. Gracias por hacerme
-          tan feliz. Te amo infinitamente.
-        </p>
-        <div className="secret-flower">{'\u273F'}</div>
-      </div>
-    </div>
-  )
-}
-
 /* ───── Celebration ───── */
 
 function CelebrationBurst() {
@@ -848,6 +829,98 @@ function BackToTop() {
   )
 }
 
+/* ───── Background Music ───── */
+
+const YT_VIDEO_ID = 'gv63CGCx6vg'
+
+function useYouTubePlayer(videoId) {
+  const playerRef = useRef(null)
+  const containerRef = useRef(null)
+  const [ready, setReady] = useState(false)
+  const [playing, setPlaying] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+
+    function createPlayer() {
+      if (cancelled || !containerRef.current) return
+      playerRef.current = new window.YT.Player(containerRef.current, {
+        videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          playsinline: 1,
+          rel: 0,
+          modestbranding: 1,
+          loop: 1,
+          playlist: videoId,
+        },
+        events: {
+          onReady: () => setReady(true),
+          onStateChange: (e) => setPlaying(e.data === window.YT.PlayerState.PLAYING),
+        },
+      })
+    }
+
+    if (window.YT && window.YT.Player) {
+      createPlayer()
+    } else {
+      const prevCallback = window.onYouTubeIframeAPIReady
+      window.onYouTubeIframeAPIReady = () => {
+        prevCallback?.()
+        createPlayer()
+      }
+      if (!document.getElementById('yt-iframe-api')) {
+        const tag = document.createElement('script')
+        tag.id = 'yt-iframe-api'
+        tag.src = 'https://www.youtube.com/iframe_api'
+        document.head.appendChild(tag)
+      }
+    }
+
+    return () => {
+      cancelled = true
+      playerRef.current?.destroy?.()
+    }
+  }, [videoId])
+
+  const play = useCallback(() => {
+    playerRef.current?.unMute?.()
+    playerRef.current?.playVideo?.()
+  }, [])
+
+  const toggle = useCallback(() => {
+    if (!playerRef.current) return
+    if (playing) {
+      playerRef.current.pauseVideo()
+    } else {
+      playerRef.current.unMute()
+      playerRef.current.playVideo()
+    }
+  }, [playing])
+
+  return { containerRef, ready, playing, play, toggle }
+}
+
+function MusicToggle({ ready, playing, onToggle }) {
+  if (!ready) return null
+  return (
+    <button
+      type="button"
+      className={`music-toggle ${playing ? 'playing' : ''}`}
+      onClick={onToggle}
+      aria-label={playing ? 'Pausar música' : 'Reproducir música'}
+      aria-pressed={playing}
+    >
+      <span className="music-toggle-icon">{'\u266A'}</span>
+      <span className="music-toggle-bars" aria-hidden="true">
+        <span /><span /><span />
+      </span>
+    </button>
+  )
+}
+
 /* ───── Lightbox ───── */
 
 function Lightbox({ src, onClose, allPhotos }) {
@@ -997,6 +1070,13 @@ function App() {
   const [lightboxSrc, setLightboxSrc] = useState(null)
   const [revealedCards, setRevealedCards] = useState(new Set())
   const reducedMotion = useReducedMotion()
+  const {
+    containerRef: ytContainerRef,
+    ready: musicReady,
+    playing: musicPlaying,
+    play: playMusic,
+    toggle: toggleMusic,
+  } = useYouTubePlayer(YT_VIDEO_ID)
 
   const heroInnerRef = useRef(null)
 
@@ -1005,8 +1085,9 @@ function App() {
 
   const handleEnter = useCallback(() => {
     setEntered(true)
+    playMusic()
     setTimeout(() => setShowContent(true), 600)
-  }, [])
+  }, [playMusic])
 
   const handleReveal = useCallback((index, revealed) => {
     setRevealedCards(prev => {
@@ -1040,19 +1121,21 @@ function App() {
     }
   }, [showContent, reducedMotion])
 
-  if (!entered) {
-    return <IntroScreen onEnter={handleEnter} />
-  }
-
   return (
-    <div className={`app ${showContent ? 'show' : ''}`}>
-      <ScrollProgress />
-      <Aurora />
-      <Starfield />
-      <FloatingPetals />
-      <PetalCursor />
+    <>
+      <div ref={ytContainerRef} className="yt-audio-mount" aria-hidden="true" />
+      {!entered ? (
+        <IntroScreen onEnter={handleEnter} />
+      ) : (
+        <div className={`app ${showContent ? 'show' : ''}`}>
+          <ScrollProgress />
+          <Aurora />
+          <Starfield />
+          <FloatingPetals />
+          <PetalCursor />
+          <MusicToggle ready={musicReady} playing={musicPlaying} onToggle={toggleMusic} />
 
-      {/* Hero */}
+          {/* Hero */}
       <header className="hero" id="inicio">
         <div className="hero-inner" ref={heroInnerRef}>
           <FadeIn>
@@ -1086,38 +1169,6 @@ function App() {
             <RevealCard key={i} src={src} index={i} onReveal={handleReveal} />
           ))}
         </div>
-        <SecretMessage unlocked={allRevealed} />
-        {allRevealed && (
-          <div className="scratch-wrap">
-            <div className="secret-letter-card secret-letter-glow animate-in">
-              <div className="secret-letter-header">
-                <span className="secret-letter-svg">
-                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="6" y="12" width="36" height="24" rx="6" fill="#fff" stroke="#222" strokeWidth="2"/>
-                    <path d="M6 12L24 30L42 12" stroke="#222" strokeWidth="2"/>
-                    <path d="M24 30L12 18" stroke="#222" strokeWidth="2"/>
-                    <path d="M24 30L36 18" stroke="#222" strokeWidth="2"/>
-                    <path d="M24 17C24 13 30 13 30 17C30 21 24 25 24 25C24 25 18 21 18 17C18 13 24 13 24 17Z" fill="#f2a900" stroke="#222" strokeWidth="1.5"/>
-                  </svg>
-                </span>
-                <span className="secret-letter-title">Primer día</span>
-              </div>
-              <div className="secret-letter-img-wrap">
-                <img src="/primer dia.jpg" alt="Primer día juntos" className="secret-letter-img round" />
-              </div>
-              <div className="secret-letter-body">
-                <p>
-                  <span className="secret-letter-highlight">Ese día comenzó nuestra historia</span>,<br/>
-                  y desde entonces cada momento a tu lado es único.<br/>
-                  <span className="secret-letter-highlight2">
-                    Gracias por elegirme para ser tu compañero de aventuras.
-                  </span>
-                </p>
-              </div>
-              <div className="secret-letter-footer">Te amo desde el primer día <span style={{fontSize:'1.2em'}}>💛</span></div>
-            </div>
-          </div>
-        )}
       </section>
 
       <Fog />
@@ -1153,10 +1204,12 @@ function App() {
       {allRevealed && <CelebrationBurst />}
       <BackToTop />
 
-      {lightboxSrc && (
-        <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} allPhotos={allPhotos} />
+          {lightboxSrc && (
+            <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} allPhotos={allPhotos} />
+          )}
+        </div>
       )}
-    </div>
+    </>
   )
 }
 

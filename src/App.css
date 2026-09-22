@@ -1149,91 +1149,6 @@
 }
 
 /* ══════════════════════════════════
-   SECRET MESSAGE
-   ══════════════════════════════════ */
-.secret-message {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-height 1s var(--ease-out), opacity 1s ease 0.3s;
-  margin-top: 0;
-}
-
-.secret-message.unlocked {
-  max-height: 320px;
-  opacity: 1;
-  margin-top: 2rem;
-}
-
-.secret-content {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  padding: 2rem 1.5rem;
-  border: 1px solid rgba(255, 215, 0, 0.22);
-  border-radius: var(--radius-lg);
-  background: var(--surface-highlight);
-  box-shadow: var(--shadow-highlight);
-}
-
-.secret-glow {
-  position: absolute;
-  inset: -30px;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.09) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: secretPulse 3s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes secretPulse {
-  0%, 100% { opacity: 0.4; }
-  50%      { opacity: 1; }
-}
-
-.secret-label {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 400;
-  font-size: 0.7rem;
-  color: #ffd700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 0.8rem;
-  opacity: 0.9;
-}
-
-.secret-text {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 300;
-  font-size: 0.9rem;
-  color: var(--gold-soft);
-  line-height: 1.8;
-}
-
-.secret-flower {
-  font-size: 1.3rem;
-  color: var(--gold);
-  margin-top: 1rem;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-.scratch-wrap {
-  display: flex;
-  justify-content: center;
-  margin-top: 32px;
-  animation: riseIn 0.9s var(--ease-out) both;
-}
-
-.scratch-wrap > .secret-letter-card {
-  width: min(100%, 440px);
-  height: auto;
-}
-
-@keyframes riseIn {
-  from { opacity: 0; transform: translateY(28px) scale(0.96); }
-  to   { opacity: 1; transform: none; }
-}
-
-/* ══════════════════════════════════
    CELEBRATION
    ══════════════════════════════════ */
 .celebration {
@@ -1414,6 +1329,90 @@
 }
 
 .back-to-top:focus-visible { outline: 2px solid #ffd700; outline-offset: 3px; }
+
+/* ══════════════════════════════════
+   BACKGROUND MUSIC
+   ══════════════════════════════════ */
+.yt-audio-mount {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 2px;
+  height: 2px;
+  opacity: 0.01;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.yt-audio-mount iframe {
+  width: 100%;
+  height: 100%;
+}
+
+.music-toggle {
+  position: fixed;
+  left: 1.4rem;
+  bottom: 1.4rem;
+  z-index: 110;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  background: radial-gradient(circle at 35% 30%, rgba(255, 213, 79, 0.35), rgba(13, 10, 5, 0.85));
+  color: var(--gold-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-elevated);
+  transition: box-shadow 0.3s ease, transform 0.3s var(--ease-spring);
+}
+
+.music-toggle:hover {
+  box-shadow: 0 0 26px rgba(255, 193, 7, 0.5);
+  transform: translateY(-4px) scale(1.08);
+}
+
+.music-toggle:focus-visible { outline: 2px solid #ffd700; outline-offset: 3px; }
+
+.music-toggle-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: opacity 0.2s ease;
+}
+
+.music-toggle-bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.music-toggle.playing .music-toggle-icon { opacity: 0; }
+.music-toggle.playing .music-toggle-bars { opacity: 1; }
+
+.music-toggle-bars span {
+  width: 3px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--gold-bright);
+  animation: musicBar 0.9s ease-in-out infinite;
+}
+
+.music-toggle-bars span:nth-child(1) { animation-delay: 0s; }
+.music-toggle-bars span:nth-child(2) { animation-delay: 0.2s; }
+.music-toggle-bars span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes musicBar {
+  0%, 100% { height: 6px; }
+  50%      { height: 16px; }
+}
 
 /* ══════════════════════════════════
    GALLERY
