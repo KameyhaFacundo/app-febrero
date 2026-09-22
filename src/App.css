@@ -1223,6 +1223,11 @@
   animation: riseIn 0.9s var(--ease-out) both;
 }
 
+.scratch-wrap > .secret-letter-card {
+  width: min(100%, 440px);
+  height: auto;
+}
+
 @keyframes riseIn {
   from { opacity: 0; transform: translateY(28px) scale(0.96); }
   to   { opacity: 1; transform: none; }

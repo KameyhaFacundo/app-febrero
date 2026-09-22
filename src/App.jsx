@@ -1,4 +1,3 @@
-import ScratchCard from './ScratchCard';
 import { useState, useEffect, useRef, useCallback } from 'react'
 import './App.css'
 import './ScratchCard.pro.css'
@@ -1090,35 +1089,33 @@ function App() {
         <SecretMessage unlocked={allRevealed} />
         {allRevealed && (
           <div className="scratch-wrap">
-            <ScratchCard width={440} height={370}>
-              <div className="secret-letter-card secret-letter-glow animate-in">
-                <div className="secret-letter-header">
-                  <span className="secret-letter-svg">
-                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="6" y="12" width="36" height="24" rx="6" fill="#fff" stroke="#222" strokeWidth="2"/>
-                      <path d="M6 12L24 30L42 12" stroke="#222" strokeWidth="2"/>
-                      <path d="M24 30L12 18" stroke="#222" strokeWidth="2"/>
-                      <path d="M24 30L36 18" stroke="#222" strokeWidth="2"/>
-                      <path d="M24 17C24 13 30 13 30 17C30 21 24 25 24 25C24 25 18 21 18 17C18 13 24 13 24 17Z" fill="#f2a900" stroke="#222" strokeWidth="1.5"/>
-                    </svg>
-                  </span>
-                  <span className="secret-letter-title">Primer día</span>
-                </div>
-                <div className="secret-letter-img-wrap">
-                  <img src="/primer dia.jpg" alt="Primer día juntos" className="secret-letter-img round" />
-                </div>
-                <div className="secret-letter-body">
-                  <p>
-                    <span className="secret-letter-highlight">Ese día comenzó nuestra historia</span>,<br/>
-                    y desde entonces cada momento a tu lado es único.<br/>
-                    <span className="secret-letter-highlight2">
-                      Gracias por elegirme para ser tu compañero de aventuras.
-                    </span>
-                  </p>
-                </div>
-                <div className="secret-letter-footer">Te amo desde el primer día <span style={{fontSize:'1.2em'}}>💛</span></div>
+            <div className="secret-letter-card secret-letter-glow animate-in">
+              <div className="secret-letter-header">
+                <span className="secret-letter-svg">
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="6" y="12" width="36" height="24" rx="6" fill="#fff" stroke="#222" strokeWidth="2"/>
+                    <path d="M6 12L24 30L42 12" stroke="#222" strokeWidth="2"/>
+                    <path d="M24 30L12 18" stroke="#222" strokeWidth="2"/>
+                    <path d="M24 30L36 18" stroke="#222" strokeWidth="2"/>
+                    <path d="M24 17C24 13 30 13 30 17C30 21 24 25 24 25C24 25 18 21 18 17C18 13 24 13 24 17Z" fill="#f2a900" stroke="#222" strokeWidth="1.5"/>
+                  </svg>
+                </span>
+                <span className="secret-letter-title">Primer día</span>
               </div>
-            </ScratchCard>
+              <div className="secret-letter-img-wrap">
+                <img src="/primer dia.jpg" alt="Primer día juntos" className="secret-letter-img round" />
+              </div>
+              <div className="secret-letter-body">
+                <p>
+                  <span className="secret-letter-highlight">Ese día comenzó nuestra historia</span>,<br/>
+                  y desde entonces cada momento a tu lado es único.<br/>
+                  <span className="secret-letter-highlight2">
+                    Gracias por elegirme para ser tu compañero de aventuras.
+                  </span>
+                </p>
+              </div>
+              <div className="secret-letter-footer">Te amo desde el primer día <span style={{fontSize:'1.2em'}}>💛</span></div>
+            </div>
           </div>
         )}
       </section>
