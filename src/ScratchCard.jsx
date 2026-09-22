@@ -19,6 +19,37 @@ function getPointerPos(e, canvas) {
   }
 }
 
+function paintFoil(ctx, width, height) {
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, '#f4cf59');
+  gradient.addColorStop(0.4, '#ffe79c');
+  gradient.addColorStop(0.7, '#d9ad2e');
+  gradient.addColorStop(1, '#f6d978');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+
+  // Soft diagonal shimmer.
+  const sheen = ctx.createLinearGradient(0, height * 0.1, width, height * 0.9);
+  sheen.addColorStop(0, 'rgba(255,255,255,0.0)');
+  sheen.addColorStop(0.45, 'rgba(255,255,255,0.22)');
+  sheen.addColorStop(0.5, 'rgba(255,255,255,0.38)');
+  sheen.addColorStop(0.55, 'rgba(255,255,255,0.18)');
+  sheen.addColorStop(1, 'rgba(255,255,255,0.0)');
+  ctx.fillStyle = sheen;
+  ctx.fillRect(0, 0, width, height);
+
+  // Subtle metallic noise pattern.
+  ctx.globalAlpha = 0.06;
+  for (let i = 0; i < 1200; i += 1) {
+    const x = Math.random() * width;
+    const y = Math.random() * height;
+    const size = 0.6 + Math.random() * 1.5;
+    ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#7a5d11';
+    ctx.fillRect(x, y, size, size);
+  }
+  ctx.globalAlpha = 1;
+}
+
 export default function ScratchCard({ width = 320, height = 180, onReveal, children }) {
   const canvasRef = useRef(null);
   const revealedRef = useRef(false);
@@ -27,6 +58,15 @@ export default function ScratchCard({ width = 320, height = 180, onReveal, child
   const [progress, setProgress] = useState(0);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [size, setSize] = useState({ width, height });
+
+  if (size.width !== width || size.height !== height) {
+    setSize({ width, height });
+    setProgress(0);
+    setScratched(false);
+    setIsDrawing(false);
+    setIsCompleting(false);
+  }
 
   const revealCard = () => {
     if (revealedRef.current) return;
@@ -40,47 +80,13 @@ export default function ScratchCard({ width = 320, height = 180, onReveal, child
     }, 260);
   };
 
-  const paintFoil = (ctx) => {
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, '#f4cf59');
-    gradient.addColorStop(0.4, '#ffe79c');
-    gradient.addColorStop(0.7, '#d9ad2e');
-    gradient.addColorStop(1, '#f6d978');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-
-    // Soft diagonal shimmer.
-    const sheen = ctx.createLinearGradient(0, height * 0.1, width, height * 0.9);
-    sheen.addColorStop(0, 'rgba(255,255,255,0.0)');
-    sheen.addColorStop(0.45, 'rgba(255,255,255,0.22)');
-    sheen.addColorStop(0.5, 'rgba(255,255,255,0.38)');
-    sheen.addColorStop(0.55, 'rgba(255,255,255,0.18)');
-    sheen.addColorStop(1, 'rgba(255,255,255,0.0)');
-    ctx.fillStyle = sheen;
-    ctx.fillRect(0, 0, width, height);
-
-    // Subtle metallic noise pattern.
-    ctx.globalAlpha = 0.06;
-    for (let i = 0; i < 1200; i += 1) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const size = 0.6 + Math.random() * 1.5;
-      ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#7a5d11';
-      ctx.fillRect(x, y, size, size);
-    }
-    ctx.globalAlpha = 1;
-  };
-
   useEffect(() => {
+    revealedRef.current = false;
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, width, height);
-    paintFoil(ctx);
-    setProgress(0);
-    setScratched(false);
-    setIsDrawing(false);
-    setIsCompleting(false);
-    revealedRef.current = false;
+    paintFoil(ctx, width, height);
     return () => clearTimeout(checkTimerRef.current);
   }, [width, height]);
 
